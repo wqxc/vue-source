@@ -1,0 +1,22 @@
+{
+  "name": "vue-source",
+  "version": "1.0.0",
+  "description": "vue源码解析",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wqxc/vue-source.git"
+  },
+  "author": "sxl",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wqxc/vue-source/issues"
+  },
+  "homepage": "https://github.com/wqxc/vue-source#readme",
+  "dependencies": {
+    "vue": "^2.6.11"
+  }
+}
