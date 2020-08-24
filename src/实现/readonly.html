@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <!-- 
+        $data的数值来源于dataDef而且在内做了拦截，不允许修改。
+        这里的不允许修改，是不允许将当$data指向别的对象。而对于对象内部的属性，是没有限制的
+
+        如此一来，我们就可以保证一个对象不可更改
+     -->
+    <script>
+        function Vue(){}
+        Vue.prototype.$data= {}
+        Vue.prototype.$props= {}
+        function warn(desc,name){
+            console.log('发生了错误: ', desc)
+        }
+        var _data = {
+            name:'打他'
+        }
+        var _props = {
+            name:'不行'
+        }
+        const dataDef = {}
+        dataDef.get = function () { return _data }
+        const propsDef = {}
+        propsDef.get = function () { return _props }
+        dataDef.set = function (newData) {
+            warn(
+                'Avoid replacing instance root $data. ' +
+                'Use nested data properties instead.',
+                this
+            )
+        }
+        propsDef.set = function () {
+            warn(`$props is readonly.`, this)
+        }
+        Object.defineProperty(Vue.prototype, '$data', dataDef)
+        Object.defineProperty(Vue.prototype, '$props', propsDef)
+        var vm = new Vue()
+        console.log('vm.$data', vm.$data)
+        vm.$data.name = '123'
+        console.log('vm.$data', vm.$data)
+    </script>
+</body>
+</html>

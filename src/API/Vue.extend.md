@@ -1,22 +1,7 @@
-/* @flow */
+## Vue.extend
 
-import { ASSET_TYPES } from 'shared/constants'
-import { defineComputed, proxy } from '../instance/state'
-import { extend, mergeOptions, validateComponentName } from '../util/index'
-
-export function initExtend (Vue: GlobalAPI) {
-  /**
-   * Each instance constructor, including Vue, has a unique
-   * cid. This enables us to create wrapped "child
-   * constructors" for prototypal inheritance and cache them.
-   */
-  Vue.cid = 0
-  let cid = 1
-
-  /**
-   * Class inheritance
-   */
-  Vue.extend = function (extendOptions: Object): Function {
+```
+Vue.extend = function (extendOptions: Object): Function {
     extendOptions = extendOptions || {}
     // this 指的是Vue 构造函数
     /*
@@ -40,16 +25,9 @@ export function initExtend (Vue: GlobalAPI) {
     const Sub = function VueComponent (options) {
       this._init(options)
     }
-    // 继承，只继承了Super原型对象上的属性，Super本身的内容没有继承。
-    // 这里 Super 指的是Vue而Vue构造函数的所有东西都在原型对象上，本身没有任何的属性。
-    // 所以这里只是继承了原型对象
-    /*
-    完全的继承则是
-    */ 
     Sub.prototype = Object.create(Super.prototype)
     Sub.prototype.constructor = Sub
     Sub.cid = cid++
-    // 合并options
     Sub.options = mergeOptions(
       Super.options,
       extendOptions
@@ -94,16 +72,72 @@ export function initExtend (Vue: GlobalAPI) {
   }
 }
 
-function initProps (Comp) {
-  const props = Comp.options.props
-  for (const key in props) {
-    proxy(Comp.prototype, `_props`, key)
-  }
+```
+
+Vue.extend 主要做的事情是继承了Vue，核心代码如下：
+
+
+```
+    ...
+
+    const Super = this
+
+    ...
+
+    const Sub = function VueComponent (options) {
+      this._init(options)
+    }
+    Sub.prototype = Object.create(Super.prototype)
+    Sub.prototype.constructor = Sub
+
+    ...
+
+    return Sub
+
+```
+以上是Vue.extend的核心代码，主要做的是继承。但是，这里写继承的方式并不完整，可以说是半继承
+之所以说是半继承，是因为上边的代码只继承了Super原型对象上的属性，Super本身的内容没有继承。
+
+## 完整的继承
+
+```
+    ...
+
+    const Super = this
+
+    ...
+
+    const Sub = function VueComponent (options) {
+      this._init(options)
+      Super.call(this) -------------------- call了一下Super
+    }
+    Sub.prototype = Object.create(Super.prototype)
+    Sub.prototype.constructor = Sub
+
+    ...
+
+    return Sub
+
+```
+
+
+Vue.extend的源码中之所以没有
+
+```
+
+Super.call(this)
+
+```
+
+是因为，不需要。
+
+我们看一下Super，也就是Vue构造函数是啥
+
+```
+function Vue (options) {
+    this._init(options)
 }
 
-function initComputed (Comp) {
-  const computed = Comp.options.computed
-  for (const key in computed) {
-    defineComputed(Comp.prototype, key, computed[key])
-  }
-}
+```
+
+很简单，没有需要constructor的属性。所以Vue.extend中就不需要调用call方法了。
