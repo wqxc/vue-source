@@ -91,3 +91,31 @@ JSON.stringify(val, null, 2)
 2 表示空两格。
 
 
+### isPrimitive
+
+检查值是否是原始值
+
+```
+export function isPrimitive (value: any): boolean {
+  return (
+    typeof value === 'string' ||
+    typeof value === 'number' ||
+    // $flow-disable-line
+    typeof value === 'symbol' ||
+    typeof value === 'boolean'
+  )
+}
+```
+
+### isValidArrayIndex
+
+判断index是否是有效的 index必须是正整数，且必须在有效的范围内
+
+```
+
+export function isValidArrayIndex (val: any): boolean {
+  const n = parseFloat(String(val))
+  return n >= 0 && Math.floor(n) === n && isFinite(val)
+}
+
+```
